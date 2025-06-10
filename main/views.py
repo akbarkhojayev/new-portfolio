@@ -1,15 +1,13 @@
-from django.core.paginator import Page
 from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-
 from main.serializers import *
-from rest_framework.views import APIView
+from drf_yasg.utils import swagger_auto_schema
 
 class UserProfileView(generics.ListAPIView):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
 class SkillListView(generics.ListAPIView):
     queryset = Skill.objects.all()
@@ -151,8 +149,4 @@ class PageViewLogListView(generics.ListAPIView):
     queryset = PageViewLog.objects.all()
     serializer_class = PageViewLogSerializer
     permission_classes = [IsAuthenticated]
-
-
-
-
 
