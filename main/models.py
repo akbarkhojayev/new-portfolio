@@ -52,11 +52,22 @@ class BlogPost(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)
+            base_slug = slugify(self.title)
+            slug = base_slug
+            num = 1
+            while BlogPost.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{num}"
+                num += 1
+            self.slug = slug
         super().save(*args, **kwargs)
+
+    @property
+    def views_count(self):
+        return self.views.count()
 
     def __str__(self):
         return self.title
+
 
 class BlogContent(models.Model):
     content = CKEditor5Field('Content')
@@ -65,7 +76,6 @@ class BlogContent(models.Model):
 
     def __str__(self):
         return self.blog_post.title
-
 
 class Experience(models.Model):
     job_title = models.CharField(max_length=150)
@@ -103,6 +113,10 @@ class PageViewLog(models.Model):
     project = models.ForeignKey(BlogPost, on_delete=models.CASCADE, related_name='views')
     ip_address = models.GenericIPAddressField()
     timestamp = models.DateTimeField(auto_now_add=True)
+
+
+    class Meta:
+        unique_together = ('project', 'ip_address')
 
     def __str__(self):
         return f"View from {self.ip_address} on {self.project.title}"

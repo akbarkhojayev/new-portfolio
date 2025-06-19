@@ -1,8 +1,8 @@
 from rest_framework import generics
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from main.serializers import *
-from drf_yasg.utils import swagger_auto_schema
 
 class UserProfileView(generics.ListAPIView):
     queryset = UserProfile.objects.all()
@@ -38,6 +38,7 @@ class ProjectCreateView(generics.CreateAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
     permission_classes = [IsAuthenticated]
+    parser_classes = [FormParser, MultiPartParser]
 
 class BlogPostListView(generics.ListAPIView):
     queryset = BlogPost.objects.all()
@@ -50,14 +51,13 @@ class BlogPostCreateView(generics.CreateAPIView):
     serializer_class = BlogPostSerializer
     permission_classes = [IsAuthenticated]
     lookup_field = 'slug'
+    parser_classes = [FormParser, MultiPartParser]
 
 class BlogPostRetrieveUpdateView(generics.RetrieveUpdateDestroyAPIView):
     queryset = BlogPost.objects.all()
     serializer_class = BlogPostSerializer
     permission_classes = [IsAuthenticated]
     lookup_field = 'slug'
-
-
 
 class BlogPostDetailView(generics.RetrieveAPIView):
     queryset = BlogPost.objects.all()
@@ -66,10 +66,9 @@ class BlogPostDetailView(generics.RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-
         ip = self.get_client_ip(request)
 
-        PageViewLog.objects.create(
+        PageViewLog.objects.get_or_create(
             project=instance,
             ip_address=ip,
         )
@@ -84,6 +83,7 @@ class BlogPostDetailView(generics.RetrieveAPIView):
         else:
             ip = request.META.get('REMOTE_ADDR')
         return ip
+
 
 class BlogContentListView(generics.ListAPIView):
     queryset = BlogContent.objects.all()
