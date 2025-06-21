@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django_ckeditor_5.widgets import CKEditor5Widget
 from django import forms
-from .models import UserProfile, Skill, Project, BlogPost, Experience, Education, Message, PageViewLog, BlogContent
+from .models import UserProfile, Skill, Project, BlogPost, Experience, Education, Message, PageViewLog, BlogContent, Tag, Comment
 
 class UserProfileAdminForm(forms.ModelForm):
     bio = forms.CharField(widget=CKEditor5Widget())
@@ -46,7 +46,7 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Skill)
 class SkillAdmin(admin.ModelAdmin):
-    list_display = ('name', 'percentage')
+    list_display = ('name',)
     search_fields = ('name',)
 
 @admin.register(Project)
@@ -93,3 +93,13 @@ class BlogContentAdmin(admin.ModelAdmin):
     list_display = ('content', 'blog_post')
     search_fields = ('content',)
     list_filter = ('blog_post',)
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('name', 'comment')
+    search_fields = ('name',)

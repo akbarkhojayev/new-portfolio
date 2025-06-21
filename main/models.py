@@ -19,20 +19,25 @@ class UserProfile(AbstractUser):
 
 class Skill(models.Model):
     name = models.CharField(max_length=100)
-    percentage = models.PositiveIntegerField(default=0)
     icon = models.ImageField(upload_to='icons/', blank=True, null=True)
 
 
     def __str__(self):
-        return f"{self.name} ({self.percentage}%)"
+        return f"{self.name})"
 
+class Tag(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    def __str__(self):
+        return self.name
 
 class Project(models.Model):
     title = models.CharField(max_length=200)
     description = CKEditor5Field('Description')
     image = models.ImageField(upload_to='projects/')
-    cover_image = models.ImageField(upload_to='projects/covers/')
+    cover_image = models.ImageField(upload_to='projects/covers/', blank=True, null=True)
+    tag = models.ManyToManyField(Tag)
     project_url = models.URLField(blank=True, null=True)
+    git_hub = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -44,9 +49,9 @@ class BlogPost(models.Model):
     content = CKEditor5Field('Content')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    tag = models.ManyToManyField(Tag)
     cover_image = models.ImageField(upload_to='blog/', blank=True, null=True)
     is_published = models.BooleanField(default=True)
-    tag = models.CharField(max_length=100)
     read_time = models.PositiveIntegerField(default=0)
     slug = models.SlugField(unique=True, blank=True)
 
@@ -67,7 +72,6 @@ class BlogPost(models.Model):
 
     def __str__(self):
         return self.title
-
 
 class BlogContent(models.Model):
     content = CKEditor5Field('Content')
@@ -101,6 +105,7 @@ class Education(models.Model):
 class Message(models.Model):
     name = models.CharField(max_length=150)
     email = models.EmailField()
+    phone = models.PositiveIntegerField()
     subject = models.CharField(max_length=200)
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -108,6 +113,15 @@ class Message(models.Model):
 
     def __str__(self):
         return f"{self.subject} from {self.name}"
+
+class Comment(models.Model):
+    name = models.CharField(max_length=20)
+    comment = models.TextField()
+    blog = models.ForeignKey(BlogPost, on_delete=models.CASCADE)
+    is_published = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.name} - {self.comment}"
 
 class PageViewLog(models.Model):
     project = models.ForeignKey(BlogPost, on_delete=models.CASCADE, related_name='views')

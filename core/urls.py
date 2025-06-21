@@ -67,4 +67,10 @@ urlpatterns += [
     path('admin-messages/<int:pk>/', MessageRetrieveDeleteUpdateView.as_view(), name='message-detail'),
 
     path('page-views/', PageViewLogListView.as_view(), name='pageview-log-list'),
+
+    path('commets/', MessageListView.as_view(), name='message-list'),
+    path('commets/create/', MessageCreateView.as_view(), name='message-create'),
+
+    path('tag/', TagListView.as_view(),)
+
 ]

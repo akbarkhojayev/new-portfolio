@@ -8,12 +8,12 @@ from aiogram.dispatcher import FSMContext
 
 from states import ContactForm
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')  # Django project settings nomi
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 django.setup()
 
 from main.models import Message
 
-bot = Bot(token="7568681687:AAGC5n3li7vEoHPt5QWv9fowWvn5U7MIkuE")  # <-- Tokenni o'zingizniki bilan almashtiring
+bot = Bot(token="7568681687:AAGC5n3li7vEoHPt5QWv9fowWvn5U7MIkuE")
 dp = Dispatcher(bot, storage=MemoryStorage())
 
 @dp.message_handler(commands=['start'])
