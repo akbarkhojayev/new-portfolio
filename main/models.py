@@ -16,7 +16,6 @@ class UserProfile(AbstractUser):
     def __str__(self):
         return self.username
 
-
 class Skill(models.Model):
     name = models.CharField(max_length=100)
     icon = models.ImageField(upload_to='icons/', blank=True, null=True)
@@ -34,7 +33,6 @@ class Project(models.Model):
     title = models.CharField(max_length=200)
     description = CKEditor5Field('Description')
     image = models.ImageField(upload_to='projects/')
-    cover_image = models.ImageField(upload_to='projects/covers/', blank=True, null=True)
     tag = models.ManyToManyField(Tag)
     project_url = models.URLField(blank=True, null=True)
     git_hub = models.URLField(blank=True, null=True)
@@ -43,14 +41,20 @@ class Project(models.Model):
     def __str__(self):
         return self.title
 
+class ProjectCoverImage(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='cover_images')
+    image = models.ImageField(upload_to='projects/covers/', blank=True, null=True)
+
+    def __str__(self):
+        return str(self.image)
 
 class BlogPost(models.Model):
     title = models.CharField(max_length=200)
     content = CKEditor5Field('Content')
+    description = models.CharField(default="Hech qanday malumot mavjud emas.")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     tag = models.ManyToManyField(Tag)
-    cover_image = models.ImageField(upload_to='blog/', blank=True, null=True)
     is_published = models.BooleanField(default=True)
     read_time = models.PositiveIntegerField(default=0)
     slug = models.SlugField(unique=True, blank=True)
@@ -73,13 +77,12 @@ class BlogPost(models.Model):
     def __str__(self):
         return self.title
 
-class BlogContent(models.Model):
-    content = CKEditor5Field('Content')
-    blog_post = models.ForeignKey(BlogPost, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+class BlogCoverImage(models.Model):
+    image = models.ImageField(upload_to='blog/' ,blank=True, null=True)
+    blogpost = models.ForeignKey(BlogPost, on_delete=models.CASCADE, related_name='cover_images')
 
     def __str__(self):
-        return self.blog_post.title
+        return str(self.image)
 
 class Experience(models.Model):
     job_title = models.CharField(max_length=150)
@@ -127,7 +130,6 @@ class PageViewLog(models.Model):
     project = models.ForeignKey(BlogPost, on_delete=models.CASCADE, related_name='views')
     ip_address = models.GenericIPAddressField()
     timestamp = models.DateTimeField(auto_now_add=True)
-
 
     class Meta:
         unique_together = ('project', 'ip_address')

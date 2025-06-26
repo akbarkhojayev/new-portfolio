@@ -36,8 +36,8 @@ urlpatterns += [
     path('user/', UserProfileView.as_view(), name='user-detail'),
 
     path('skills/', SkillListView.as_view(), name='skill-list'),
-    path('admin-skills/create/', SkillCreateView.as_view(), name='skill-create'),
-    path('admin-skills/<int:pk>/', SkillRetrieveDeleteUpdateView.as_view(), name='skill-detail'),
+    path('admin/skills/create/', SkillCreateView.as_view(), name='skill-create'),
+    path('admin/skills/<int:pk>/', SkillRetrieveDeleteUpdateView.as_view(), name='skill-detail'),
 
     path('projects/', ProjectListView.as_view(), name='project-list'),
     path('admin-projects/create/', ProjectCreateView.as_view(), name='project-create'),
@@ -48,17 +48,18 @@ urlpatterns += [
     path('admin-blogs/<slug:slug>/', BlogPostRetrieveUpdateView.as_view(), name='blog-detail'),
     path('blog/<slug:slug>/', BlogPostDetailView.as_view(), name='blog'),
 
-    path('admin-blog-content/create/', BlogContentCreateView.as_view(), name='blog-create'),
-    path('blog-content/', BlogContentListView.as_view(), name='blog-content-list'),
-    path('admin-blog-content/<int:pk>/', BlogContentRetrieveUpdateView.as_view(), name='blog-content-detail'),
+    path('admin-blog-cover-image/create/', BlogCoverImageCreateView.as_view(), name='blog-cover'),
+    path('admin-blog-cover-image/<int:pk>/', BlogCoverImageRetrieveDeleteUpdateView.as_view(), name='blog-cover-detail'),
 
+    path('admin-project-cover-image/create/', ProjectsCoverImageCreateView.as_view(), name='project-cover'),
+    path('admin-project-cover-image/<int:pk>/', ProjectsCoverImageRetrieveDeleteUpdateView.as_view(), name='project-cover-detail'),
 
     path('experiences/', ExperienceListView.as_view(), name='experience-list'),
-    path('admin-experiences/create/', ExperienceCreateView.as_view(), name='experience-create'),
-    path('admin-experiences/<int:pk>/', ExperienceRetrieveDeleteUpdateView.as_view(), name='experience-detail'),
+    path('admin-experience/create/', ExperienceCreateView.as_view(), name='experience-create'),
+    path('admin-experience/<int:pk>/', ExperienceRetrieveDeleteUpdateView.as_view(), name='experience-detail'),
 
 
-    path('education/', EducationListView.as_view(), name='education-list'),
+    path('educations/', EducationListView.as_view(), name='education-list'),
     path('admin-education/create/', EducationCreateView.as_view(), name='education-create'),
     path('admin-education/<int:pk>/', EducationRetrieveDeleteUpdateView.as_view(), name='education-detail'),
 
@@ -68,9 +69,10 @@ urlpatterns += [
 
     path('page-views/', PageViewLogListView.as_view(), name='pageview-log-list'),
 
-    path('commets/', MessageListView.as_view(), name='message-list'),
-    path('commets/create/', MessageCreateView.as_view(), name='message-create'),
+    path('blogs/comments/<int:blog_id>/', CommentsListView.as_view(), name='message-list'),
 
-    path('tag/', TagListView.as_view(),)
+    path('comments/create/', CommentCreateView.as_view(), name='message-create'),
+
+    path('tags/', TagListView.as_view(),)
 
 ]

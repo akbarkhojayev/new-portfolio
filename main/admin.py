@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django_ckeditor_5.widgets import CKEditor5Widget
 from django import forms
-from .models import UserProfile, Skill, Project, BlogPost, Experience, Education, Message, PageViewLog, BlogContent, Tag, Comment
+from .models import UserProfile, Skill, Project, BlogPost, Experience, Education, Message, PageViewLog, \
+    Tag, Comment, ProjectCoverImage, BlogCoverImage
+from django.utils.html import format_html
 
 class UserProfileAdminForm(forms.ModelForm):
     bio = forms.CharField(widget=CKEditor5Widget())
@@ -87,13 +89,6 @@ class PageViewLogAdmin(admin.ModelAdmin):
     list_filter = ('timestamp',)
     search_fields = ('ip_address', 'project__title')
 
-
-@admin.register(BlogContent)
-class BlogContentAdmin(admin.ModelAdmin):
-    list_display = ('content', 'blog_post')
-    search_fields = ('content',)
-    list_filter = ('blog_post',)
-
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     list_display = ('name',)
@@ -103,3 +98,28 @@ class TagAdmin(admin.ModelAdmin):
 class CommentAdmin(admin.ModelAdmin):
     list_display = ('name', 'comment')
     search_fields = ('name',)
+
+@admin.register(ProjectCoverImage)
+class ProjectCoverImageAdmin(admin.ModelAdmin):
+    list_display = ('id', 'thumbnail')
+
+
+    def thumbnail(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" width="100" title="{}" />', obj.image.url, obj.image.name)
+        return "-"
+
+    thumbnail.short_description = 'Preview'
+
+
+@admin.register(BlogCoverImage)
+class BlogCoverImageAdmin(admin.ModelAdmin):
+    list_display = ('id', 'thumbnail')
+
+
+    def thumbnail(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" width="100" title="{}" />', obj.image.url, obj.image.name)
+        return "-"
+
+    thumbnail.short_description = 'Preview'

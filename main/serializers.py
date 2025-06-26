@@ -4,11 +4,16 @@ from .models import *
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = '__all__'
+        fields = ['first_name', 'last_name', 'avatar', 'bio', 'location', 'github', 'linkedin', 'website']
 
 class SkillSerializer(serializers.ModelSerializer):
     class Meta:
         model = Skill
+        fields = '__all__'
+
+class ProjectsCoverImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectCoverImage
         fields = '__all__'
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -17,12 +22,22 @@ class ProjectSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field='name'
     )
+    cover_images = ProjectsCoverImageSerializer(many=True, read_only=True)
+
     class Meta:
         model = Project
         fields = '__all__'
 
+
+class BlogCoverImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BlogCoverImage
+        fields = '__all__'
+
 class BlogPostSerializer(serializers.ModelSerializer):
     view_count = serializers.SerializerMethodField()
+    comment_count = serializers.SerializerMethodField()
+    cover_images = BlogCoverImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = BlogPost
@@ -31,11 +46,8 @@ class BlogPostSerializer(serializers.ModelSerializer):
 
     def get_view_count(self, obj):
         return obj.views.count()
-
-class BlogContentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BlogContent
-        fields = '__all__'
+    def get_comment_count(self, obj):
+        return obj.comment_set.count()
 
 class ExperienceSerializer(serializers.ModelSerializer):
     class Meta:
