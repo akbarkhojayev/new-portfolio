@@ -1,8 +1,7 @@
 from django.contrib import admin
 from django_ckeditor_5.widgets import CKEditor5Widget
 from django import forms
-from .models import UserProfile, Skill, Project, BlogPost, Experience, Education, Message, PageViewLog, \
-    Tag, Comment, ProjectCoverImage, BlogCoverImage
+from .models import UserProfile, Skill, Project, BlogPost, Experience, Education,SoftSkill , Message, PageViewLog,BlogCoverImage, Tag, Comment, ProjectCoverImage
 from django.utils.html import format_html
 
 class UserProfileAdminForm(forms.ModelForm):
@@ -33,6 +32,7 @@ class ExperienceAdminForm(forms.ModelForm):
         model = Experience
         fields = '__all__'
 
+
 class EducationAdminForm(forms.ModelForm):
     description = forms.CharField(widget=CKEditor5Widget())
 
@@ -48,6 +48,11 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Skill)
 class SkillAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)
+
+@admin.register(SoftSkill)
+class SoftSkillAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
 
@@ -99,18 +104,17 @@ class CommentAdmin(admin.ModelAdmin):
     list_display = ('name', 'comment')
     search_fields = ('name',)
 
-@admin.register(ProjectCoverImage)
-class ProjectCoverImageAdmin(admin.ModelAdmin):
-    list_display = ('id', 'thumbnail')
+    @admin.register(ProjectCoverImage)
+    class ProjectCoverImageAdmin(admin.ModelAdmin):
+        list_display = ('id', 'thumbnail')
 
 
-    def thumbnail(self, obj):
-        if obj.image:
-            return format_html('<img src="{}" width="100" title="{}" />', obj.image.url, obj.image.name)
-        return "-"
+        def thumbnail(self, obj):
+            if obj.image:
+                return format_html('<img src="{}" width="100" title="{}" />', obj.image.url, obj.image.name)
+            return "-"
 
-    thumbnail.short_description = 'Preview'
-
+        thumbnail.short_description = 'Preview'
 
 @admin.register(BlogCoverImage)
 class BlogCoverImageAdmin(admin.ModelAdmin):
