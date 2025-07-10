@@ -39,6 +39,10 @@ urlpatterns += [
     path('admin/skills/create/', SkillCreateView.as_view(), name='skill-create'),
     path('admin/skills/<int:pk>/', SkillRetrieveDeleteUpdateView.as_view(), name='skill-detail'),
 
+    path('softskills/', SoftSkillListAPIView.as_view(), name='softskill-list'),
+    path('admin/skills/<int:pk>/', SoftSkillRetrieveDeleteUpdateView.as_view(), name='softskill-detail'),
+
+
     path('projects/', ProjectListView.as_view(), name='project-list'),
     path('admin-projects/create/', ProjectCreateView.as_view(), name='project-create'),
     path('admin-projects/<int:pk>/', ProjectRetrieveDeleteUpdateView.as_view(), name='project-detail'),
@@ -70,6 +74,7 @@ urlpatterns += [
     path('page-views/', PageViewLogListView.as_view(), name='pageview-log-list'),
 
     path('blogs/comments/<int:blog_id>/', CommentsListView.as_view(), name='message-list'),
+    path('comments/last/', LastCommentsView.as_view(), name='last-two-comments'),
 
     path('comments/create/', CommentCreateView.as_view(), name='message-create'),
 
