@@ -8,6 +8,8 @@ class UserProfile(AbstractUser):
     last_name = models.CharField(max_length=100)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     bio = CKEditor5Field('Bio')
+    job = models.CharField(max_length=100, blank=True, null=True)
+    resume = models.FileField(blank=True, null=True)
     location = models.CharField(max_length=100, blank=True)
     github = models.URLField(blank=True)
     linkedin = models.URLField(blank=True)
@@ -19,10 +21,20 @@ class UserProfile(AbstractUser):
 class Skill(models.Model):
     name = models.CharField(max_length=100)
     icon = models.ImageField(upload_to='icons/', blank=True, null=True)
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='skills')
 
 
     def __str__(self):
         return f"{self.name})"
+
+class SoftSkill(models.Model):
+    name = models.CharField(max_length=100)
+    icon = models.ImageField(upload_to='icons/', blank=True, null=True)
+    is_active = models.BooleanField(default=False)
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='softskills')
+
+    def __str__(self):
+        return self.name
 
 class Tag(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -52,6 +64,7 @@ class BlogPost(models.Model):
     title = models.CharField(max_length=200)
     content = CKEditor5Field('Content')
     description = models.CharField(default="Hech qanday malumot mavjud emas.")
+    image = models.ImageField(upload_to='blog/' ,blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     tag = models.ManyToManyField(Tag)
@@ -122,6 +135,7 @@ class Comment(models.Model):
     comment = models.TextField()
     blog = models.ForeignKey(BlogPost, on_delete=models.CASCADE)
     is_published = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     def __str__(self):
         return f"{self.name} - {self.comment}"
