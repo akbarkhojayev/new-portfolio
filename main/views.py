@@ -11,6 +11,11 @@ class UserProfileView(generics.ListAPIView):
     serializer_class = UserProfileSerializer
     permission_classes = [AllowAny]
 
+class UserProfilUpdate(generics.UpdateAPIView):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+    permission_classes = [IsAuthenticated]
+
 class SkillListView(generics.ListAPIView):
     queryset = Skill.objects.all()
     serializer_class = SkillSerializer
@@ -32,18 +37,24 @@ class ProjectListView(generics.ListAPIView):
     pagination_class = CustomPageNumberPagination
     permission_classes = [AllowAny]
 
-class ProjectRetrieveDeleteUpdateView(generics.RetrieveUpdateDestroyAPIView):
+class ProjectRetrieveDeleteUpdateView(generics.RetrieveDestroyAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
 
     def get_permissions(self):
-        if self.request.method in ['PUT', 'PATCH', 'DELETE']:
+        if self.request.method in ['DELETE']:
             return [IsAuthenticated()]
         return [AllowAny()]
 
-class ProjectCreateView(generics.CreateAPIView):
+class ProjectUpdateView(generics.UpdateAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
+    permission_classes = [IsAuthenticated]
+    parser_classes = [FormParser, MultiPartParser]
+
+class ProjectCreateView(generics.CreateAPIView):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializerCreate
     permission_classes = [IsAuthenticated]
     parser_classes = [FormParser, MultiPartParser]
 
@@ -56,21 +67,50 @@ class BlogPostListView(generics.ListAPIView):
 
 class BlogPostCreateView(generics.CreateAPIView):
     queryset = BlogPost.objects.all()
-    serializer_class = BlogPostSerializer
+    serializer_class = BlogPostSerializerCreate
     permission_classes = [IsAuthenticated]
-    lookup_field = 'slug'
     parser_classes = [FormParser, MultiPartParser]
+    lookup_field = 'slug'
 
-class BlogPostRetrieveUpdateView(generics.RetrieveUpdateDestroyAPIView):
+class BlogPostRetrieveDestroyView(generics.RetrieveDestroyAPIView):
     queryset = BlogPost.objects.all()
     serializer_class = BlogPostSerializer
 
     def get_permissions(self):
-        if self.request.method in ['PUT', 'PATCH', 'DELETE']:
+        if self.request.method in ['DELETE']:
             return [IsAuthenticated()]
         return [AllowAny()]
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        ip = self.get_client_ip(request)
+
+        PageViewLog.objects.get_or_create(
+            project=instance,
+            ip_address=ip,
+        )
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def get_client_ip(self, request):
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
+
     lookup_field = 'slug'
+
+
+class BlogPostUpdateView(generics.UpdateAPIView):
+    queryset = BlogPost.objects.all()
+    serializer_class = BlogPostSerializer
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+    lookup_field = 'slug'
+
 
 class BlogPostDetailView(generics.RetrieveAPIView):
     queryset = BlogPost.objects.all()
@@ -166,15 +206,27 @@ class CommentsListView(generics.ListAPIView):
         blog = get_object_or_404(BlogPost, id=blog_id)
         return Comment.objects.filter(blog=blog, is_published=True).order_by('-id')
 
+class LastCommentsView(generics.ListAPIView):
+    serializer_class = CommentSerializer
+    pagination_class = None  # pagination yo'q
+
+    def get_queryset(self):
+        return Comment.objects.filter(is_published=True).order_by('-created_at')[:2]
+
+
 class CommentCreateView(generics.CreateAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = [AllowAny]
 
-class TagListView(generics.ListAPIView):
+class TagListView(generics.ListCreateAPIView):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    permission_classes = [AllowAny]
+    def get_permissions(self):
+        if self.request.method in ['POST']:
+            return [IsAuthenticated()]
+        return [AllowAny()]
+
 
 class BlogCoverImageCreateView(generics.CreateAPIView):
     queryset = BlogCoverImage.objects.all()
@@ -206,3 +258,25 @@ class ProjectsCoverImageRetrieveDeleteUpdateView(generics.RetrieveUpdateDestroyA
         if self.request.method in ['PUT', 'PATCH', 'DELETE']:
             return [IsAuthenticated()]
         return [AllowAny()]
+
+
+class SoftSkillListAPIView(generics.ListCreateAPIView):
+    serializer_class = SoftSkillSerializer
+
+    def get_queryset(self):
+        return SoftSkill.objects.filter(is_active=True)
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsAuthenticated()]
+        return [AllowAny()]
+
+class SoftSkillRetrieveDeleteUpdateView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = SoftSkill.objects.all()
+    serializer_class = SkillSerializer
+    def get_permissions(self):
+        if self.request.method in ['PUT', 'PATCH', 'DELETE']:
+            return [IsAuthenticated()]
+        return [AllowAny()]
+
+
